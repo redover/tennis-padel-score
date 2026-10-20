@@ -9,7 +9,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.material.MaterialTheme
 import com.redover.punteggio.ui.ScoreScreen
-import com.redover.punteggio.ui.SetupScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,17 +20,12 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 val vm: MatchViewModel = viewModel()
                 val match by vm.match.collectAsStateWithLifecycle()
-                val current = match
-                if (current == null) {
-                    SetupScreen(initial = vm.lastConfig, onStart = vm::start)
-                } else {
-                    ScoreScreen(
-                        match = current,
-                        onPoint = vm::point,
-                        onUndo = vm::undo,
-                        onNewMatch = vm::reset,
-                    )
-                }
+                ScoreScreen(
+                    match = match,
+                    onAddPoint = vm::addPoint,
+                    onRemovePoint = vm::removePoint,
+                    onReset = vm::reset,
+                )
             }
         }
     }

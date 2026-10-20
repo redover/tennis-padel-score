@@ -4,20 +4,17 @@ App per smartwatch Wear OS (pensata per il OnePlus Watch 2R) per tenere il punte
 
 ## Cosa fa
 
-- Punti 0 / 15 / 30 / 40 / AD, oppure **golden point** (padel) sul 40-40.
-- Game, set e **tie-break** a 7 sul 6-6, con la rotazione corretta del servizio.
-- **Super tie-break** a 10 opzionale per il set decisivo.
-- Set unico, 2 su 3 o 3 su 5.
-- **Annulla** l'ultimo punto (anche più volte, anche dopo la fine di un set o della partita).
+- Si apre direttamente sul punteggio 0-0, senza impostazioni.
+- Punti 0 / 15 / 30 / 40 / AD, game, set e **tie-break** a 7 sul 6-6, con la rotazione corretta del servizio. I set non hanno limite: si gioca finché vuoi.
 - Indicatore di chi serve (pallina gialla).
 - La partita viene salvata a ogni punto: se l'app si chiude, riprende da dove eri.
 - Lo schermo resta acceso durante la partita.
 
 ## Come si usa
 
-1. Scegli sport, numero di set, golden point, super tie-break e chi serve, poi **Inizia**.
-2. Tocca la **metà alta** (blu, "LORO") o la **metà bassa** (verde, "NOI") per assegnare il punto.
-3. Al centro vedi set e game; il tasto ↶ annulla l'ultimo punto.
+- Metà alta (blu) = **LORO**, metà bassa (verde) = **NOI**.
+- In ogni metà: tocca a **destra** per aggiungere un punto, a **sinistra** per toglierlo.
+- Al centro vedi set e game. **Tieni premuta** la barra centrale per azzerare e iniziare una nuova partita.
 
 ## Struttura
 

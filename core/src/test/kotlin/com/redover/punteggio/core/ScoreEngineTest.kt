@@ -158,4 +158,39 @@ class ScoreEngineTest {
         assertEquals(m.current, rebuilt.current)
         assertEquals(m.undo().current, rebuilt.undo().current)
     }
+
+    @Test
+    fun `togliere un punto a chi non ha segnato per ultimo`() {
+        val m = Match.start(MatchConfig.tennis()).points(US, US, THEM)
+        assertEquals("30" to "15", labels(m))
+        val fixed = m.removePointOf(US)
+        assertEquals("15" to "15", labels(fixed))
+        assertEquals(listOf(US, THEM), fixed.pointLog)
+    }
+
+    @Test
+    fun `togliere il punto che ha chiuso il game riapre il game`() {
+        val m = Match.start(MatchConfig.tennis()).points(US, US, US, US)
+        assertEquals(1, m.current.gamesUs)
+        val fixed = m.removePointOf(US)
+        assertEquals(0, fixed.current.gamesUs)
+        assertEquals("40" to "0", labels(fixed))
+    }
+
+    @Test
+    fun `non si toglie nulla a chi non ha punti nel game`() {
+        val m = Match.start(MatchConfig.tennis()).points(US, US, US, US, THEM)
+        assertEquals(m, m.removePointOf(US))
+        assertEquals(m, Match.start(MatchConfig.tennis()).let { it.removePointOf(US) }.let { if (it.pointLog.isEmpty()) m else it })
+        val fresh = Match.start(MatchConfig.tennis())
+        assertEquals(fresh, fresh.removePointOf(THEM))
+    }
+
+    @Test
+    fun `partita libera non finisce mai`() {
+        var m = Match.start(MatchConfig.freePlay())
+        repeat(5) { m = m.games(6, US) }
+        assertNull(m.current.winner)
+        assertEquals(5, m.current.setsWon(US))
+    }
 }

@@ -36,6 +36,9 @@ data class MatchConfig(
     companion object {
         fun tennis() = MatchConfig(sport = Sport.TENNIS)
         fun padel() = MatchConfig(sport = Sport.PADEL, goldenPoint = true)
+
+        /** Partita libera: regole classiche (vantaggi, tie-break sul 6-6) e set senza limite. */
+        fun freePlay() = MatchConfig(setsToWin = 99)
     }
 }
 
