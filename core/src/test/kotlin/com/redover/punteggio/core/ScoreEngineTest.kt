@@ -1,0 +1,161 @@
+package com.redover.punteggio.core
+
+import com.redover.punteggio.core.Player.THEM
+import com.redover.punteggio.core.Player.US
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class ScoreEngineTest {
+
+    private fun Match.points(vararg players: Player): Match =
+        players.fold(this) { m, p -> m.point(p) }
+
+    private fun Match.repeat(n: Int, player: Player): Match =
+        (1..n).fold(this) { m, _ -> m.point(player) }
+
+    private fun Match.games(n: Int, player: Player): Match = repeat(n * 4, player)
+
+    private fun labels(m: Match) = m.current.pointLabel(US) to m.current.pointLabel(THEM)
+
+    @Test
+    fun `punti base 0 15 30 40`() {
+        var m = Match.start(MatchConfig.tennis())
+        assertEquals("0" to "0", labels(m))
+        m = m.point(US)
+        assertEquals("15" to "0", labels(m))
+        m = m.point(US)
+        assertEquals("30" to "0", labels(m))
+        m = m.point(THEM)
+        assertEquals("30" to "15", labels(m))
+        m = m.point(US)
+        assertEquals("40" to "15", labels(m))
+        m = m.point(US)
+        assertEquals(1, m.current.gamesUs)
+        assertEquals("0" to "0", labels(m))
+    }
+
+    @Test
+    fun `parita e vantaggi nel tennis`() {
+        var m = Match.start(MatchConfig.tennis()).points(US, US, US, THEM, THEM, THEM)
+        assertTrue(m.current.isDeuce)
+        assertEquals("40" to "40", labels(m))
+        m = m.point(THEM)
+        assertEquals("40" to "AD", labels(m))
+        m = m.point(US)
+        assertTrue(m.current.isDeuce)
+        m = m.point(US).point(US)
+        assertEquals(1, m.current.gamesUs)
+        assertEquals(0, m.current.gamesThem)
+    }
+
+    @Test
+    fun `golden point nel padel`() {
+        var m = Match.start(MatchConfig.padel()).points(US, US, US, THEM, THEM, THEM)
+        assertTrue(m.current.isGoldenPoint)
+        m = m.point(THEM)
+        assertEquals(1, m.current.gamesThem)
+        assertEquals(0, m.current.pointsUs)
+    }
+
+    @Test
+    fun `set vinto 6-4 e servizio alternato`() {
+        var m = Match.start(MatchConfig.tennis())
+        assertEquals(US, m.current.server)
+        m = m.games(1, US)
+        assertEquals(THEM, m.current.server)
+        m = m.games(4, THEM).games(5, US)
+        assertEquals(listOf(SetScore(6, 4)), m.current.completedSets)
+        assertEquals(0, m.current.gamesUs)
+    }
+
+    @Test
+    fun `sul 6-5 si continua fino al 7-5`() {
+        val m = Match.start(MatchConfig.tennis()).games(5, US).games(5, THEM).games(1, US)
+        assertEquals(6, m.current.gamesUs)
+        assertTrue(m.current.completedSets.isEmpty())
+        val done = m.games(1, US)
+        assertEquals(listOf(SetScore(7, 5)), done.current.completedSets)
+    }
+
+    @Test
+    fun `tie-break sul 6-6 con rotazione del servizio`() {
+        var m = Match.start(MatchConfig.tennis()).games(5, US).games(5, THEM).games(1, US).games(1, THEM)
+        assertTrue(m.current.inTieBreak)
+        // 12 game giocati: serve di nuovo chi ha iniziato il set.
+        val first = m.current.server
+        assertEquals(US, first)
+        m = m.point(US)
+        assertEquals("1" to "0", labels(m))
+        assertEquals(THEM, m.current.server)
+        m = m.point(US)
+        assertEquals(THEM, m.current.server)
+        m = m.point(US)
+        assertEquals(US, m.current.server)
+        m = m.point(THEM).point(THEM).point(THEM).point(THEM).point(THEM)
+        // 3-5
+        m = m.repeat(4, US)
+        // 7-5
+        val set = m.current.completedSets.single()
+        assertEquals(SetScore(7, 6, 7, 5), set)
+        // Dopo il tie-break serve chi ha ricevuto il primo punto.
+        assertEquals(THEM, m.current.server)
+    }
+
+    @Test
+    fun `tie-break serve due punti di scarto`() {
+        var m = Match.start(MatchConfig.tennis()).games(5, US).games(5, THEM).games(1, US).games(1, THEM)
+        repeat(6) { m = m.points(US, THEM) }
+        m = m.point(US)
+        assertTrue(m.current.inTieBreak)
+        m = m.point(US)
+        assertEquals(SetScore(7, 6, 8, 6), m.current.completedSets.single())
+    }
+
+    @Test
+    fun `partita due set su tre`() {
+        var m = Match.start(MatchConfig.tennis()).games(6, US)
+        assertNull(m.current.winner)
+        m = m.games(6, THEM)
+        m = m.games(6, US)
+        assertEquals(US, m.current.winner)
+        assertEquals(2, m.current.setsWon(US))
+        val after = m.point(THEM)
+        assertEquals(m, after)
+    }
+
+    @Test
+    fun `super tie-break nel set decisivo`() {
+        val config = MatchConfig.padel().copy(superTieBreakFinalSet = true)
+        var m = Match.start(config).games(6, US).games(6, THEM)
+        assertTrue(m.current.inTieBreak)
+        assertTrue(m.current.isSuperTieBreak)
+        m = m.repeat(9, THEM)
+        assertTrue(m.current.inTieBreak)
+        m = m.point(THEM)
+        assertEquals(THEM, m.current.winner)
+        assertEquals(SetScore(0, 1, 0, 10), m.current.completedSets.last())
+    }
+
+    @Test
+    fun `annulla ripristina lo stato precedente anche dopo un set`() {
+        val before = Match.start(MatchConfig.tennis()).games(5, US).points(US, US, US)
+        val after = before.point(US)
+        assertEquals(1, after.current.completedSets.size)
+        val undone = after.undo()
+        assertEquals(before.current, undone.current)
+        assertTrue(undone.canUndo)
+        assertFalse(Match.start(MatchConfig.tennis()).canUndo)
+    }
+
+    @Test
+    fun `replay ricostruisce la partita dal log dei punti`() {
+        val config = MatchConfig.padel().copy(superTieBreakFinalSet = true)
+        val m = Match.start(config).games(6, US).games(3, THEM).points(US, THEM, THEM)
+        val rebuilt = Match.replay(config, m.pointLog)
+        assertEquals(m.current, rebuilt.current)
+        assertEquals(m.undo().current, rebuilt.undo().current)
+    }
+}

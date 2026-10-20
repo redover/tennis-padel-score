@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icona provvisoria: una pallina verde. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="#C6E832"
+        android:pathData="M24,4a20,20 0,1 1,0 40a20,20 0,1 1,0 -40z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000"
+        android:pathData="M9,12C17,18 17,30 9,36M39,12C31,18 31,30 39,36" />
+</vector>
