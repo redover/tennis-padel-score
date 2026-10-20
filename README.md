@@ -14,7 +14,8 @@ App per smartwatch Wear OS (pensata per il OnePlus Watch 2R) per tenere il punte
 
 - Metà alta (blu) = **LORO**, metà bassa (verde) = **NOI**.
 - In ogni metà: tocca a **destra** per aggiungere un punto, a **sinistra** per toglierlo.
-- Al centro vedi set e game. **Tieni premuta** la barra centrale per azzerare e iniziare una nuova partita.
+- **Scorri verso l'alto** per dare il servizio a loro, **verso il basso** per darlo a noi. La pallina gialla indica chi serve e da lì la rotazione continua da sola.
+- Al centro vedi set e game. Il pulsante **↺** azzera il punteggio, dopo averti chiesto conferma.
 
 ## Struttura
 

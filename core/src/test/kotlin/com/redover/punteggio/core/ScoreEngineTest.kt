@@ -193,4 +193,40 @@ class ScoreEngineTest {
         assertNull(m.current.winner)
         assertEquals(5, m.current.setsWon(US))
     }
+
+    @Test
+    fun `cambio manuale del servizio e rotazione successiva`() {
+        var m = Match.start(MatchConfig.freePlay())
+        assertEquals(US, m.current.server)
+        m = m.serve(THEM)
+        assertEquals(THEM, m.current.server)
+        m = m.games(1, US)
+        assertEquals(US, m.current.server)
+        // Assegnare il servizio a chi serve già non cambia nulla.
+        assertEquals(m, m.serve(US))
+    }
+
+    @Test
+    fun `cambio servizio nel tie-break`() {
+        var m = Match.start(MatchConfig.tennis()).games(5, US).games(5, THEM).games(1, US).games(1, THEM)
+        assertTrue(m.current.inTieBreak)
+        assertEquals(US, m.current.server)
+        m = m.serve(THEM)
+        assertEquals(THEM, m.current.server)
+        m = m.point(US)
+        assertEquals(US, m.current.server)
+        m = m.point(US)
+        assertEquals(US, m.current.server)
+        m = m.point(US)
+        assertEquals(THEM, m.current.server)
+    }
+
+    @Test
+    fun `salvataggio e ripristino con cambi di servizio`() {
+        val config = MatchConfig.freePlay()
+        val m = Match.start(config).points(US, THEM).serve(THEM).points(US, US, US).removePointOf(THEM)
+        val restored = Match.decode(config, m.encodeEvents())
+        assertEquals(m.current, restored.current)
+        assertEquals(m.events, restored.events)
+    }
 }

@@ -25,18 +25,19 @@ class MatchViewModel(app: Application) : AndroidViewModel(app) {
 
     fun removePoint(player: Player) = update(_match.value.removePointOf(player))
 
+    fun setServer(player: Player) = update(_match.value.serve(player))
+
     fun reset() = update(Match.start(CONFIG))
 
     private fun update(match: Match) {
         _match.value = match
         prefs.edit()
-            .putString(KEY_LOG, match.pointLog.joinToString("") { if (it == Player.US) "U" else "T" })
+            .putString(KEY_LOG, match.encodeEvents())
             .apply()
     }
 
     private fun loadMatch(): Match {
-        val log = prefs.getString(KEY_LOG, "").orEmpty().map { if (it == 'U') Player.US else Player.THEM }
-        return Match.replay(CONFIG, log)
+        return Match.decode(CONFIG, prefs.getString(KEY_LOG, "").orEmpty())
     }
 
     private companion object {

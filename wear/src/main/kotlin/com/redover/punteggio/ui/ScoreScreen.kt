@@ -3,6 +3,7 @@ package com.redover.punteggio.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,18 +21,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Chip
+import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Text
 import com.redover.punteggio.core.Match
@@ -45,13 +52,15 @@ private val BallColor = Color(0xFFC6E832)
 /**
  * Metà alta = avversari ("Loro"), metà bassa = noi.
  * In ogni metà: tocco a destra = +1 punto, tocco a sinistra = −1.
- * Tenendo premuta la barra centrale si azzera la partita.
+ * Scorrere verso l'alto dà il servizio a loro, verso il basso a noi.
+ * Il pulsante al centro azzera la partita, dopo una conferma.
  */
 @Composable
 fun ScoreScreen(
     match: Match,
     onAddPoint: (Player) -> Unit,
     onRemovePoint: (Player) -> Unit,
+    onSetServer: (Player) -> Unit,
     onReset: () -> Unit,
 ) {
     val state = match.current
@@ -67,8 +76,35 @@ fun ScoreScreen(
         onRemovePoint(it)
     }
 
+    val swipeThreshold = with(LocalDensity.current) { 40.dp.toPx() }
+    val setServer: (Player) -> Unit = {
+        if (state.server != it) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+        onSetServer(it)
+    }
+    // Il gesto vive più a lungo di una singola composizione: usa sempre lo stato aggiornato.
+    val currentSetServer by rememberUpdatedState(setServer)
+
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    var dragged = 0f
+                    detectVerticalDragGestures(
+                        onDragStart = { dragged = 0f },
+                        onVerticalDrag = { change, amount ->
+                            change.consume()
+                            dragged += amount
+                        },
+                        onDragEnd = {
+                            when {
+                                dragged < -swipeThreshold -> currentSetServer(Player.THEM)
+                                dragged > swipeThreshold -> currentSetServer(Player.US)
+                            }
+                        },
+                    )
+                },
+        ) {
             PlayerHalf(
                 state = state,
                 player = Player.THEM,
@@ -79,10 +115,7 @@ fun ScoreScreen(
                 onAdd = { add(Player.THEM) },
                 onRemove = { remove(Player.THEM) },
             )
-            MiddleBar(state = state, onLongPress = {
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                confirmReset = true
-            })
+            MiddleBar(state = state, onReset = { confirmReset = true })
             PlayerHalf(
                 state = state,
                 player = Player.US,
@@ -165,20 +198,30 @@ private fun PointText(state: MatchState, player: Player) {
 }
 
 @Composable
-private fun MiddleBar(state: MatchState, onLongPress: () -> Unit) {
+private fun MiddleBar(state: MatchState, onReset: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(44.dp)
+            .height(48.dp)
             .background(Color.Black)
-            .pointerInput(Unit) { detectTapGestures(onLongPress = { onLongPress() }) }
             .padding(horizontal = 28.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         // Set vinti e game del set corrente: Loro sopra, Noi sotto.
         ScoreColumn(title = "SET", them = state.setsWon(Player.THEM), us = state.setsWon(Player.US))
-        Text(statusLabel(state).orEmpty(), fontSize = 9.sp, color = BallColor, textAlign = TextAlign.Center)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Button(
+                onClick = onReset,
+                modifier = Modifier.size(ButtonDefaults.ExtraSmallButtonSize),
+                colors = ButtonDefaults.secondaryButtonColors(),
+            ) {
+                Text("↺", fontSize = 16.sp)
+            }
+            statusLabel(state)?.let {
+                Text(it, fontSize = 9.sp, color = BallColor, textAlign = TextAlign.Center)
+            }
+        }
         ScoreColumn(title = "GAME", them = state.gamesThem, us = state.gamesUs)
     }
 }
@@ -211,20 +254,21 @@ private fun ResetDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Nuova partita?",
-                fontSize = 16.sp,
+                text = "Vuoi azzerare il punteggio?",
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = BallColor,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 8.dp),
             )
             Chip(
                 onClick = onConfirm,
-                label = { Text("Azzera") },
+                label = { Text("Sì, azzera") },
                 colors = ChipDefaults.primaryChipColors(),
             )
             Chip(
                 onClick = onDismiss,
-                label = { Text("Continua") },
+                label = { Text("No") },
                 colors = ChipDefaults.secondaryChipColors(),
                 modifier = Modifier.padding(top = 4.dp),
             )

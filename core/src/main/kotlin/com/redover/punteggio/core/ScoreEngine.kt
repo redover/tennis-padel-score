@@ -13,6 +13,14 @@ object ScoreEngine {
         return if (state.inTieBreak) afterTieBreakPoint(scored, player) else afterGamePoint(scored, player)
     }
 
+    /** Cambia a mano chi serve. Nel tie-break sposta la rotazione in modo che serva [player] ora. */
+    fun setServer(state: MatchState, player: Player): MatchState {
+        if (state.isOver || state.server == player) return state
+        if (!state.inTieBreak) return state.copy(server = player)
+        val first = state.tieBreakFirstServer ?: state.server
+        return state.copy(server = player, tieBreakFirstServer = first.other)
+    }
+
     private fun afterGamePoint(state: MatchState, player: Player): MatchState {
         val mine = state.points(player)
         val theirs = state.points(player.other)

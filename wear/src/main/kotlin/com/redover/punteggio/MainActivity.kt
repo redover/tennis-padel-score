@@ -24,6 +24,7 @@ class MainActivity : ComponentActivity() {
                     match = match,
                     onAddPoint = vm::addPoint,
                     onRemovePoint = vm::removePoint,
+                    onSetServer = vm::setServer,
                     onReset = vm::reset,
                 )
             }
