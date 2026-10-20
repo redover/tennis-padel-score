@@ -28,7 +28,7 @@ App per smartwatch Wear OS (pensata per il OnePlus Watch 2R) per tenere il punte
 
 Serve [Android Studio](https://developer.android.com/studio) (oppure scarica l'APK già compilato dalla scheda **Actions** del repo, artefatto `punteggio-debug-apk`).
 
-1. Sull'orologio: Impostazioni → Sistema → Informazioni → tocca 7 volte "Numero build" per attivare le Opzioni sviluppatore.
+1. Sull'orologio (OnePlus Watch 2R): Impostazioni → Altro → Informazioni sull'orologio → Altre informazioni versione → tocca 7 volte "Numero build" per attivare le Opzioni sviluppatore.
 2. Opzioni sviluppatore → attiva **Debug ADB** e **Debug wireless**. Orologio e computer devono essere sulla stessa rete Wi-Fi.
 3. In Debug wireless tocca "Associa nuovo dispositivo" e sul computer:
    ```
