@@ -15,6 +15,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Durante la partita lo schermo resta acceso, così il punteggio è sempre visibile.
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        // Se l'orologio si blocca tra un punto e l'altro, il punteggio compare sopra il blocco
+        // schermo: si segna il punto senza inserire il PIN. Il resto dell'orologio resta bloccato.
+        setShowWhenLocked(true)
+        setTurnScreenOn(true)
 
         setContent {
             MaterialTheme {

@@ -8,7 +8,7 @@ App per smartwatch Wear OS (pensata per il OnePlus Watch 2R) per tenere il punte
 - Punti 0 / 15 / 30 / 40 / AD, game, set e **tie-break** a 7 sul 6-6, con la rotazione corretta del servizio. I set non hanno limite: si gioca finché vuoi.
 - Indicatore di chi serve (pallina gialla).
 - La partita viene salvata a ogni punto: se l'app si chiude, riprende da dove eri.
-- Lo schermo resta acceso durante la partita.
+- Lo schermo resta acceso durante la partita e, se l'orologio si blocca, il punteggio compare sopra il blocco schermo: non serve inserire il PIN tra un punto e l'altro.
 
 ## Come si usa
 
