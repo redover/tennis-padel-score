@@ -107,7 +107,6 @@ fun ScoreScreen(
             PlayerHalf(
                 state = state,
                 player = Player.THEM,
-                label = "LORO",
                 color = ThemColor,
                 top = true,
                 modifier = Modifier.weight(1f),
@@ -118,7 +117,6 @@ fun ScoreScreen(
             PlayerHalf(
                 state = state,
                 player = Player.US,
-                label = "NOI",
                 color = UsColor,
                 top = false,
                 modifier = Modifier.weight(1f),
@@ -146,7 +144,6 @@ fun ScoreScreen(
 private fun PlayerHalf(
     state: MatchState,
     player: Player,
-    label: String,
     color: Color,
     top: Boolean,
     modifier: Modifier,
@@ -173,19 +170,20 @@ private fun PlayerHalf(
                 Text("+", fontSize = 22.sp, color = Color.White.copy(alpha = 0.5f), modifier = Modifier.padding(end = 22.dp))
             }
         }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(top = if (top) 0.dp else 2.dp, bottom = if (top) 2.dp else 0.dp),
+        // Punti, con la pallina gialla accanto a chi serve. Blu = loro, verde = noi.
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = if (top) 0.dp else 6.dp, bottom = if (top) 6.dp else 0.dp),
         ) {
-            if (!top) PointText(state, player)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (state.server == player) {
-                    Box(Modifier.size(8.dp).background(BallColor, CircleShape))
-                    Spacer(Modifier.width(4.dp))
-                }
-                Text(text = label, fontSize = 11.sp, color = Color.White.copy(alpha = 0.8f))
-            }
-            if (top) PointText(state, player)
+            Box(
+                Modifier
+                    .size(10.dp)
+                    .background(if (state.server == player) BallColor else Color.Transparent, CircleShape),
+            )
+            Spacer(Modifier.width(8.dp))
+            PointText(state, player)
+            // Spazio uguale a destra, così il numero resta centrato.
+            Spacer(Modifier.width(18.dp))
         }
     }
 }
