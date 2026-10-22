@@ -155,7 +155,8 @@ private fun PlayerHalf(
 ) {
     Box(
         modifier = modifier.fillMaxWidth().background(color),
-        contentAlignment = Alignment.Center,
+        // Il punteggio sta vicino alla barra centrale, lontano dai bordi curvi e dall'ora.
+        contentAlignment = if (top) Alignment.BottomCenter else Alignment.TopCenter,
     ) {
         // Due zone di tocco: sinistra toglie, destra aggiunge.
         Row(modifier = Modifier.fillMaxSize()) {
@@ -174,7 +175,7 @@ private fun PlayerHalf(
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(top = if (top) 26.dp else 0.dp, bottom = if (top) 0.dp else 18.dp),
+            modifier = Modifier.padding(top = if (top) 0.dp else 2.dp, bottom = if (top) 2.dp else 0.dp),
         ) {
             if (!top) PointText(state, player)
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -182,7 +183,7 @@ private fun PlayerHalf(
                     Box(Modifier.size(8.dp).background(BallColor, CircleShape))
                     Spacer(Modifier.width(4.dp))
                 }
-                Text(text = label, fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
+                Text(text = label, fontSize = 11.sp, color = Color.White.copy(alpha = 0.8f))
             }
             if (top) PointText(state, player)
         }
@@ -193,7 +194,8 @@ private fun PlayerHalf(
 private fun PointText(state: MatchState, player: Player) {
     Text(
         text = state.pointLabel(player),
-        fontSize = 46.sp,
+        fontSize = 40.sp,
+        lineHeight = 40.sp,
         fontWeight = FontWeight.Bold,
         color = Color.White,
     )
@@ -204,7 +206,7 @@ private fun MiddleBar(state: MatchState, onReset: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .height(44.dp)
             .background(Color.Black)
             .padding(horizontal = 28.dp),
         verticalAlignment = Alignment.CenterVertically,
