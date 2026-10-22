@@ -52,6 +52,9 @@ data class SetScore(
     val winner: Player get() = if (us > them) Player.US else Player.THEM
 }
 
+/** Punti e servizio di un conteggio messo da parte (game normale o tie-break). */
+data class SavedScore(val us: Int, val them: Int, val server: Player)
+
 data class MatchState(
     val config: MatchConfig,
     val completedSets: List<SetScore> = emptyList(),
@@ -66,6 +69,9 @@ data class MatchState(
     /** Chi ha servito il primo punto del tie-break in corso. */
     val tieBreakFirstServer: Player? = null,
     val winner: Player? = null,
+    /** Punteggio normale messo da parte mentre si guarda il tie-break, e viceversa. */
+    val savedGame: SavedScore? = null,
+    val savedTieBreak: SavedScore? = null,
 ) {
     val isOver: Boolean get() = winner != null
 

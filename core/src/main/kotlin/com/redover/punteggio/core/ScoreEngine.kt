@@ -22,16 +22,37 @@ object ScoreEngine {
     }
 
     /**
-     * Passa a mano dal game normale al tie-break e viceversa. I punti già fatti restano
-     * (30-15 diventa 2-1), così uno swipe sbagliato si annulla con lo swipe opposto.
-     * Il tie-break manuale va a 7 e chi lo vince prende il set, come quello sul 6-6.
+     * Passa a mano dal game normale al tie-break e viceversa. Sono due conteggi separati:
+     * il tie-break parte da 0-0 e, tornando indietro, il game normale è esattamente com'era.
+     * Il tie-break va a 7 e chi lo vince prende il set, come quello sul 6-6.
      */
     fun setTieBreak(state: MatchState, on: Boolean): MatchState {
         if (state.isOver || state.inTieBreak == on) return state
         return if (on) {
-            state.copy(inTieBreak = true, isSuperTieBreak = false, tieBreakFirstServer = state.server)
+            val tb = state.savedTieBreak
+            val firstServer = tb?.server ?: state.server
+            val next = state.copy(
+                inTieBreak = true,
+                isSuperTieBreak = false,
+                pointsUs = tb?.us ?: 0,
+                pointsThem = tb?.them ?: 0,
+                tieBreakFirstServer = firstServer,
+                savedGame = SavedScore(state.pointsUs, state.pointsThem, state.server),
+                savedTieBreak = null,
+            )
+            next.copy(server = tieBreakServer(next))
         } else {
-            state.copy(inTieBreak = false, isSuperTieBreak = false, tieBreakFirstServer = null)
+            val game = state.savedGame
+            state.copy(
+                inTieBreak = false,
+                isSuperTieBreak = false,
+                pointsUs = game?.us ?: 0,
+                pointsThem = game?.them ?: 0,
+                server = game?.server ?: state.server,
+                tieBreakFirstServer = null,
+                savedTieBreak = SavedScore(state.pointsUs, state.pointsThem, state.tieBreakFirstServer ?: state.server),
+                savedGame = null,
+            )
         }
     }
 
@@ -73,6 +94,7 @@ object ScoreEngine {
             pointsUs = 0,
             pointsThem = 0,
             server = state.server.other,
+            savedTieBreak = null,
         )
         val target = state.config.gamesPerSet
         val mine = next.games(player)
@@ -122,6 +144,8 @@ object ScoreEngine {
             inTieBreak = false,
             isSuperTieBreak = false,
             tieBreakFirstServer = null,
+            savedGame = null,
+            savedTieBreak = null,
         )
         val toWin = state.config.setsToWin
         val wonUs = sets.count { it.winner == Player.US }

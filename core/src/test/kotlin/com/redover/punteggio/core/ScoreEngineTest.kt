@@ -243,14 +243,28 @@ class ScoreEngineTest {
     }
 
     @Test
-    fun `tornare al punteggio normale conserva i punti`() {
+    fun `tie-break e punteggio normale sono conteggi separati`() {
         val m = Match.start(MatchConfig.freePlay()).points(US, US, THEM)
-        val tb = m.tieBreak(true)
-        assertEquals("2" to "1", labels(tb))
+        assertEquals("30" to "15", labels(m))
+        var tb = m.tieBreak(true)
+        assertEquals("0" to "0", labels(tb))
+        tb = tb.points(THEM, THEM, US)
+        assertEquals("1" to "2", labels(tb))
         val back = tb.tieBreak(false)
         assertEquals("30" to "15", labels(back))
-        assertEquals(m.current, back.current)
+        assertEquals(m.current.server, back.current.server)
+        // Riaprendo il tie-break si riprende da dove era.
+        assertEquals("1" to "2", labels(back.tieBreak(true)))
         assertEquals(tb, tb.tieBreak(true))
+    }
+
+    @Test
+    fun `tie-break vinto azzera anche il game normale messo da parte`() {
+        var m = Match.start(MatchConfig.freePlay()).points(US, THEM).tieBreak(true)
+        m = m.repeat(7, THEM)
+        assertEquals(SetScore(0, 1, 0, 7), m.current.completedSets.single())
+        assertEquals("0" to "0", labels(m))
+        assertEquals("0" to "0", labels(m.tieBreak(true)))
     }
 
     @Test
