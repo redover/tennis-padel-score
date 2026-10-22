@@ -3,7 +3,7 @@ package com.redover.punteggio.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +25,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -43,6 +44,7 @@ import androidx.wear.compose.material.TimeText
 import com.redover.punteggio.core.Match
 import com.redover.punteggio.core.MatchState
 import com.redover.punteggio.core.Player
+import kotlin.math.abs
 
 private val UsColor = Color(0xFF1B5E20)
 private val ThemColor = Color(0xFF0D47A1)
@@ -52,6 +54,7 @@ private val BallColor = Color(0xFFC6E832)
  * Metà alta = avversari ("Loro"), metà bassa = noi.
  * In ogni metà: tocco a destra = +1 punto, tocco a sinistra = −1.
  * Scorrere verso l'alto dà il servizio a loro, verso il basso a noi.
+ * Scorrere a destra trasforma il game in tie-break, a sinistra torna al punteggio normale.
  * Il pulsante al centro azzera la partita, dopo una conferma.
  */
 @Composable
@@ -60,6 +63,7 @@ fun ScoreScreen(
     onAddPoint: (Player) -> Unit,
     onRemovePoint: (Player) -> Unit,
     onSetServer: (Player) -> Unit,
+    onSetTieBreak: (Boolean) -> Unit,
     onReset: () -> Unit,
 ) {
     val state = match.current
@@ -80,27 +84,35 @@ fun ScoreScreen(
         if (state.server != it) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         onSetServer(it)
     }
+    val setTieBreak: (Boolean) -> Unit = {
+        if (state.inTieBreak != it) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+        onSetTieBreak(it)
+    }
+    val onSwipe: (Swipe?) -> Unit = {
+        when (it) {
+            Swipe.UP -> setServer(Player.THEM)
+            Swipe.DOWN -> setServer(Player.US)
+            Swipe.RIGHT -> setTieBreak(true)
+            Swipe.LEFT -> setTieBreak(false)
+            null -> Unit
+        }
+    }
     // Il gesto vive più a lungo di una singola composizione: usa sempre lo stato aggiornato.
-    val currentSetServer by rememberUpdatedState(setServer)
+    val currentOnSwipe by rememberUpdatedState(onSwipe)
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    var dragged = 0f
-                    detectVerticalDragGestures(
-                        onDragStart = { dragged = 0f },
-                        onVerticalDrag = { change, amount ->
+                    var dragged = Offset.Zero
+                    detectDragGestures(
+                        onDragStart = { dragged = Offset.Zero },
+                        onDrag = { change, amount ->
                             change.consume()
                             dragged += amount
                         },
-                        onDragEnd = {
-                            when {
-                                dragged < -swipeThreshold -> currentSetServer(Player.THEM)
-                                dragged > swipeThreshold -> currentSetServer(Player.US)
-                            }
-                        },
+                        onDragEnd = { currentOnSwipe(swipeDirection(dragged, swipeThreshold)) },
                     )
                 },
         ) {
@@ -138,6 +150,17 @@ fun ScoreScreen(
             )
         }
     }
+}
+
+private enum class Swipe { UP, DOWN, LEFT, RIGHT }
+
+/** Direzione prevalente dello swipe, o null se il movimento è troppo corto. */
+private fun swipeDirection(dragged: Offset, threshold: Float): Swipe? = when {
+    abs(dragged.x) >= abs(dragged.y) && dragged.x > threshold -> Swipe.RIGHT
+    abs(dragged.x) >= abs(dragged.y) && dragged.x < -threshold -> Swipe.LEFT
+    abs(dragged.y) > abs(dragged.x) && dragged.y > threshold -> Swipe.DOWN
+    abs(dragged.y) > abs(dragged.x) && dragged.y < -threshold -> Swipe.UP
+    else -> null
 }
 
 @Composable

@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
                     onAddPoint = vm::addPoint,
                     onRemovePoint = vm::removePoint,
                     onSetServer = vm::setServer,
+                    onSetTieBreak = vm::setTieBreak,
                     onReset = vm::reset,
                 )
             }

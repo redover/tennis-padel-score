@@ -229,4 +229,34 @@ class ScoreEngineTest {
         assertEquals(m.current, restored.current)
         assertEquals(m.events, restored.events)
     }
+
+    @Test
+    fun `tie-break manuale vinto chiude il set`() {
+        var m = Match.start(MatchConfig.freePlay()).games(2, US).games(2, THEM)
+        m = m.tieBreak(true)
+        assertTrue(m.current.inTieBreak)
+        m = m.point(US)
+        assertEquals("1" to "0", labels(m))
+        m = m.repeat(6, US)
+        assertEquals(SetScore(3, 2, 7, 0), m.current.completedSets.single())
+        assertFalse(m.current.inTieBreak)
+    }
+
+    @Test
+    fun `tornare al punteggio normale conserva i punti`() {
+        val m = Match.start(MatchConfig.freePlay()).points(US, US, THEM)
+        val tb = m.tieBreak(true)
+        assertEquals("2" to "1", labels(tb))
+        val back = tb.tieBreak(false)
+        assertEquals("30" to "15", labels(back))
+        assertEquals(m.current, back.current)
+        assertEquals(tb, tb.tieBreak(true))
+    }
+
+    @Test
+    fun `il tie-break manuale viene salvato e ripristinato`() {
+        val config = MatchConfig.freePlay()
+        val m = Match.start(config).points(US, THEM).tieBreak(true).points(US, US)
+        assertEquals(m.current, Match.decode(config, m.encodeEvents()).current)
+    }
 }

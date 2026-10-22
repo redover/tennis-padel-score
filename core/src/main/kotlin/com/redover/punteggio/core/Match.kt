@@ -1,9 +1,10 @@
 package com.redover.punteggio.core
 
-/** Ciò che succede durante la partita: un punto vinto o un cambio manuale del servizio. */
+/** Ciò che succede durante la partita: un punto vinto, un cambio manuale del servizio o del tie-break. */
 sealed interface MatchEvent {
     data class Point(val player: Player) : MatchEvent
     data class Serve(val player: Player) : MatchEvent
+    data class TieBreak(val on: Boolean) : MatchEvent
 }
 
 /**
@@ -27,11 +28,15 @@ data class Match(
     /** Assegna il servizio a mano; da lì in poi la rotazione riparte da [player]. */
     fun serve(player: Player): Match = apply(MatchEvent.Serve(player))
 
+    /** Trasforma a mano il game in corso in tie-break ([on] = true) o lo riporta a game normale. */
+    fun tieBreak(on: Boolean): Match = apply(MatchEvent.TieBreak(on))
+
     private fun apply(event: MatchEvent): Match {
         if (current.isOver) return this
         val next = when (event) {
             is MatchEvent.Point -> ScoreEngine.pointWonBy(current, event.player)
             is MatchEvent.Serve -> ScoreEngine.setServer(current, event.player)
+            is MatchEvent.TieBreak -> ScoreEngine.setTieBreak(current, event.on)
         }
         if (next == current) return this
         return Match(next, history + current, events + event)
@@ -58,11 +63,12 @@ data class Match(
         return replayEvents(config, events.filterIndexed { i, _ -> i != index })
     }
 
-    /** Eventi in forma compatta per salvarli: U/T = punto noi/loro, u/t = servizio a noi/loro. */
+    /** Eventi in forma compatta per salvarli: U/T = punto noi/loro, u/t = servizio a noi/loro, B/b = tie-break sì/no. */
     fun encodeEvents(): String = events.joinToString("") {
         when (it) {
             is MatchEvent.Point -> if (it.player == Player.US) "U" else "T"
             is MatchEvent.Serve -> if (it.player == Player.US) "u" else "t"
+            is MatchEvent.TieBreak -> if (it.on) "B" else "b"
         }
     }
 
@@ -82,6 +88,8 @@ data class Match(
                     'T' -> MatchEvent.Point(Player.THEM)
                     'u' -> MatchEvent.Serve(Player.US)
                     't' -> MatchEvent.Serve(Player.THEM)
+                    'B' -> MatchEvent.TieBreak(true)
+                    'b' -> MatchEvent.TieBreak(false)
                     else -> null
                 }
             })

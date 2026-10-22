@@ -21,6 +21,20 @@ object ScoreEngine {
         return state.copy(server = player, tieBreakFirstServer = first.other)
     }
 
+    /**
+     * Passa a mano dal game normale al tie-break e viceversa. I punti già fatti restano
+     * (30-15 diventa 2-1), così uno swipe sbagliato si annulla con lo swipe opposto.
+     * Il tie-break manuale va a 7 e chi lo vince prende il set, come quello sul 6-6.
+     */
+    fun setTieBreak(state: MatchState, on: Boolean): MatchState {
+        if (state.isOver || state.inTieBreak == on) return state
+        return if (on) {
+            state.copy(inTieBreak = true, isSuperTieBreak = false, tieBreakFirstServer = state.server)
+        } else {
+            state.copy(inTieBreak = false, isSuperTieBreak = false, tieBreakFirstServer = null)
+        }
+    }
+
     private fun afterGamePoint(state: MatchState, player: Player): MatchState {
         val mine = state.points(player)
         val theirs = state.points(player.other)

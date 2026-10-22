@@ -27,6 +27,8 @@ class MatchViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setServer(player: Player) = update(_match.value.serve(player))
 
+    fun setTieBreak(on: Boolean) = update(_match.value.tieBreak(on))
+
     fun reset() = update(Match.start(CONFIG))
 
     private fun update(match: Match) {

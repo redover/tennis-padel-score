@@ -18,7 +18,7 @@ class ScoreScreenScreenshotTest {
 
     private fun snapshot(match: Match) = paparazzi.snapshot {
         MaterialTheme {
-            ScoreScreen(match = match, onAddPoint = {}, onRemovePoint = {}, onSetServer = {}, onReset = {})
+            ScoreScreen(match = match, onAddPoint = {}, onRemovePoint = {}, onSetServer = {}, onSetTieBreak = {}, onReset = {})
         }
     }
 
@@ -33,6 +33,13 @@ class ScoreScreenScreenshotTest {
         repeat(3) { m = (1..4).fold(m) { acc, _ -> acc.point(THEM) } }
         listOf(US, THEM, US, US, US, US, THEM, THEM, THEM, THEM, US, US, US, US, US, THEM, US)
             .forEach { m = m.point(it) }
+        snapshot(m)
+    }
+
+    @Test
+    fun tieBreak() {
+        var m = Match.start(MatchConfig.freePlay()).tieBreak(true)
+        listOf(US, THEM, US, US, THEM).forEach { m = m.point(it) }
         snapshot(m)
     }
 }
