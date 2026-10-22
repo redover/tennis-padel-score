@@ -289,14 +289,14 @@ internal fun MenuDialog(onReset: () -> Unit, onClose: () -> Unit, onDismiss: () 
             .pointerInput(Unit) { detectTapGestures { } },
         contentAlignment = Alignment.Center,
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "Cosa vuoi fare?",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = BallColor,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 6.dp),
+                modifier = Modifier.padding(bottom = 2.dp),
             )
             CompactChip(
                 onClick = onReset,
@@ -307,13 +307,11 @@ internal fun MenuDialog(onReset: () -> Unit, onClose: () -> Unit, onDismiss: () 
                 onClick = onClose,
                 label = { Text("Chiudi app") },
                 colors = ChipDefaults.secondaryChipColors(),
-                modifier = Modifier.padding(top = 6.dp),
             )
             CompactChip(
                 onClick = onDismiss,
                 label = { Text("Annulla") },
                 colors = ChipDefaults.secondaryChipColors(),
-                modifier = Modifier.padding(top = 6.dp),
             )
         }
     }
