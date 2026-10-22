@@ -16,9 +16,9 @@ class ScoreScreenScreenshotTest {
     @get:Rule
     val paparazzi = Paparazzi(deviceConfig = DeviceConfig.WEAR_OS_SMALL_ROUND)
 
-    private fun snapshot(match: Match) = paparazzi.snapshot {
+    private fun snapshot(match: Match, ambient: Boolean = false) = paparazzi.snapshot {
         MaterialTheme {
-            ScoreScreen(match = match, onAddPoint = {}, onRemovePoint = {}, onSetServer = {}, onSetTieBreak = {}, onReset = {})
+            ScoreScreen(match = match, ambient = ambient, onAddPoint = {}, onRemovePoint = {}, onSetServer = {}, onSetTieBreak = {}, onReset = {})
         }
     }
 
@@ -41,5 +41,12 @@ class ScoreScreenScreenshotTest {
         var m = Match.start(MatchConfig.freePlay()).tieBreak(true)
         listOf(US, THEM, US, US, THEM).forEach { m = m.point(it) }
         snapshot(m)
+    }
+
+    @Test
+    fun polsoAbbassato() {
+        var m = Match.start(MatchConfig.freePlay())
+        listOf(US, US, THEM).forEach { m = m.point(it) }
+        snapshot(m, ambient = true)
     }
 }

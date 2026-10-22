@@ -60,6 +60,7 @@ private val BallColor = Color(0xFFC6E832)
 @Composable
 fun ScoreScreen(
     match: Match,
+    ambient: Boolean = false,
     onAddPoint: (Player) -> Unit,
     onRemovePoint: (Player) -> Unit,
     onSetServer: (Player) -> Unit,
@@ -119,17 +120,19 @@ fun ScoreScreen(
             PlayerHalf(
                 state = state,
                 player = Player.THEM,
-                color = ThemColor,
+                color = if (ambient) Color.Black else ThemColor,
+                ambient = ambient,
                 top = true,
                 modifier = Modifier.weight(1f),
                 onAdd = { add(Player.THEM) },
                 onRemove = { remove(Player.THEM) },
             )
-            MiddleBar(state = state, onReset = { confirmReset = true })
+            MiddleBar(state = state, ambient = ambient, onReset = { confirmReset = true })
             PlayerHalf(
                 state = state,
                 player = Player.US,
-                color = UsColor,
+                color = if (ambient) Color.Black else UsColor,
+                ambient = ambient,
                 top = false,
                 modifier = Modifier.weight(1f),
                 onAdd = { add(Player.US) },
@@ -168,6 +171,7 @@ private fun PlayerHalf(
     state: MatchState,
     player: Player,
     color: Color,
+    ambient: Boolean,
     top: Boolean,
     modifier: Modifier,
     onAdd: () -> Unit,
@@ -181,16 +185,16 @@ private fun PlayerHalf(
         // Due zone di tocco: sinistra toglie, destra aggiunge.
         Row(modifier = Modifier.fillMaxSize()) {
             Box(
-                modifier = Modifier.weight(1f).fillMaxHeight().clickable(onClick = onRemove),
+                modifier = Modifier.weight(1f).fillMaxHeight().clickable(enabled = !ambient, onClick = onRemove),
                 contentAlignment = Alignment.CenterStart,
             ) {
-                Text("−", fontSize = 22.sp, color = Color.White.copy(alpha = 0.5f), modifier = Modifier.padding(start = 22.dp))
+                if (!ambient) Text("−", fontSize = 22.sp, color = Color.White.copy(alpha = 0.5f), modifier = Modifier.padding(start = 22.dp))
             }
             Box(
-                modifier = Modifier.weight(1f).fillMaxHeight().clickable(onClick = onAdd),
+                modifier = Modifier.weight(1f).fillMaxHeight().clickable(enabled = !ambient, onClick = onAdd),
                 contentAlignment = Alignment.CenterEnd,
             ) {
-                Text("+", fontSize = 22.sp, color = Color.White.copy(alpha = 0.5f), modifier = Modifier.padding(end = 22.dp))
+                if (!ambient) Text("+", fontSize = 22.sp, color = Color.White.copy(alpha = 0.5f), modifier = Modifier.padding(end = 22.dp))
             }
         }
         // Punti, con la pallina gialla accanto a chi serve. Blu = loro, verde = noi.
@@ -223,7 +227,7 @@ private fun PointText(state: MatchState, player: Player) {
 }
 
 @Composable
-private fun MiddleBar(state: MatchState, onReset: () -> Unit) {
+private fun MiddleBar(state: MatchState, ambient: Boolean, onReset: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -236,7 +240,8 @@ private fun MiddleBar(state: MatchState, onReset: () -> Unit) {
         // Set vinti e game del set corrente: Loro sopra, Noi sotto.
         ScoreColumn(title = "SET", them = state.setsWon(Player.THEM), us = state.setsWon(Player.US))
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(
+            // A schermo attenuato niente pulsante, solo il punteggio.
+            if (!ambient) Button(
                 onClick = onReset,
                 modifier = Modifier.size(ButtonDefaults.ExtraSmallButtonSize),
                 colors = ButtonDefaults.secondaryButtonColors(),
