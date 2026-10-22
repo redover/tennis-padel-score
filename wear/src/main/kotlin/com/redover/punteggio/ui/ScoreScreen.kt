@@ -39,6 +39,7 @@ import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
+import androidx.wear.compose.material.CompactChip
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import com.redover.punteggio.core.Match
@@ -55,7 +56,7 @@ private val BallColor = Color(0xFFC6E832)
  * In ogni metà: tocco a destra = +1 punto, tocco a sinistra = −1.
  * Scorrere verso l'alto dà il servizio a loro, verso il basso a noi.
  * Scorrere a destra trasforma il game in tie-break, a sinistra torna al punteggio normale.
- * Il pulsante al centro azzera la partita, dopo una conferma.
+ * Il pulsante al centro apre un menu per azzerare la partita o chiudere l'app.
  */
 @Composable
 fun ScoreScreen(
@@ -66,6 +67,7 @@ fun ScoreScreen(
     onSetServer: (Player) -> Unit,
     onSetTieBreak: (Boolean) -> Unit,
     onReset: () -> Unit,
+    onClose: () -> Unit = {},
 ) {
     val state = match.current
     val haptics = LocalHapticFeedback.current
@@ -144,10 +146,14 @@ fun ScoreScreen(
         TimeText()
 
         if (confirmReset) {
-            ResetDialog(
-                onConfirm = {
+            MenuDialog(
+                onReset = {
                     confirmReset = false
                     onReset()
+                },
+                onClose = {
+                    confirmReset = false
+                    onClose()
                 },
                 onDismiss = { confirmReset = false },
             )
@@ -272,8 +278,9 @@ private fun ScoreColumn(title: String, them: Int, us: Int) {
     }
 }
 
+/** Menu del pulsante centrale: azzerare il punteggio o chiudere l'app. */
 @Composable
-private fun ResetDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+internal fun MenuDialog(onReset: () -> Unit, onClose: () -> Unit, onDismiss: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -284,23 +291,29 @@ private fun ResetDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Vuoi azzerare il punteggio?",
+                text = "Cosa vuoi fare?",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = BallColor,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 8.dp),
+                modifier = Modifier.padding(bottom = 6.dp),
             )
-            Chip(
-                onClick = onConfirm,
-                label = { Text("Sì, azzera") },
+            CompactChip(
+                onClick = onReset,
+                label = { Text("Azzera punteggio") },
                 colors = ChipDefaults.primaryChipColors(),
             )
-            Chip(
-                onClick = onDismiss,
-                label = { Text("No") },
+            CompactChip(
+                onClick = onClose,
+                label = { Text("Chiudi app") },
                 colors = ChipDefaults.secondaryChipColors(),
-                modifier = Modifier.padding(top = 4.dp),
+                modifier = Modifier.padding(top = 6.dp),
+            )
+            CompactChip(
+                onClick = onDismiss,
+                label = { Text("Annulla") },
+                colors = ChipDefaults.secondaryChipColors(),
+                modifier = Modifier.padding(top = 6.dp),
             )
         }
     }

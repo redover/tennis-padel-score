@@ -44,6 +44,12 @@ class MainActivity : ComponentActivity() {
             if (it) MatchOngoingService.start(this)
         }
 
+    /** Chiude davvero l'app: finisce l'attività in corso e toglie Punteggio dalle app recenti. */
+    private fun closeApp() {
+        MatchOngoingService.stop(this)
+        finishAndRemoveTask()
+    }
+
     override fun onDestroy() {
         // Uscendo davvero dall'app (non solo spegnendo lo schermo) l'attività in corso finisce.
         if (isFinishing) MatchOngoingService.stop(this)
@@ -78,6 +84,7 @@ class MainActivity : ComponentActivity() {
                     onSetServer = vm::setServer,
                     onSetTieBreak = vm::setTieBreak,
                     onReset = vm::reset,
+                    onClose = ::closeApp,
                 )
             }
         }

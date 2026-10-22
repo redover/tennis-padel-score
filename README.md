@@ -17,7 +17,7 @@ App per smartwatch Wear OS (pensata per il OnePlus Watch 2R) per tenere il punte
 - In ogni metà: tocca a **destra** per aggiungere un punto, a **sinistra** per toglierlo.
 - **Scorri verso l'alto** per dare il servizio a loro, **verso il basso** per darlo a noi. La pallina gialla indica chi serve e da lì la rotazione continua da sola.
 - **Scorri a destra** per trasformare il game in tie-break (conteggio separato che parte da 0-0, fino a 7; chi vince prende il set), **a sinistra** per tornare al game normale, che resta com'era. Lo swipe a destra quindi non chiude l'app: per uscire usa il tasto dell'orologio.
-- Al centro vedi set e game. Il pulsante **↺** azzera il punteggio, dopo averti chiesto conferma.
+- Al centro vedi set e game. Il pulsante **↺** apre un menu: **Azzera punteggio**, **Chiudi app** oppure Annulla. La partita resta aperta anche a schermo spento, quindi per chiuderla usa "Chiudi app".
 
 ## Struttura
 

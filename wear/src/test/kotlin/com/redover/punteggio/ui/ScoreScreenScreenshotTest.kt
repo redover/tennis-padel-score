@@ -49,4 +49,11 @@ class ScoreScreenScreenshotTest {
         listOf(US, US, THEM).forEach { m = m.point(it) }
         snapshot(m, ambient = true)
     }
+
+    @Test
+    fun menu() = paparazzi.snapshot {
+        MaterialTheme {
+            MenuDialog(onReset = {}, onClose = {}, onDismiss = {})
+        }
+    }
 }
