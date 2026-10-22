@@ -39,6 +39,7 @@ import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Text
+import androidx.wear.compose.material.TimeText
 import com.redover.punteggio.core.Match
 import com.redover.punteggio.core.MatchState
 import com.redover.punteggio.core.Player
@@ -126,6 +127,9 @@ fun ScoreScreen(
             )
         }
 
+        // Ora corrente, in alto lungo il bordo dello schermo.
+        TimeText()
+
         if (confirmReset) {
             ResetDialog(
                 onConfirm = {
@@ -170,7 +174,7 @@ private fun PlayerHalf(
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(top = if (top) 18.dp else 0.dp, bottom = if (top) 0.dp else 18.dp),
+            modifier = Modifier.padding(top = if (top) 26.dp else 0.dp, bottom = if (top) 0.dp else 18.dp),
         ) {
             if (!top) PointText(state, player)
             Row(verticalAlignment = Alignment.CenterVertically) {

@@ -25,6 +25,21 @@ jobs:
         run: ./gradlew :core:test
       - name: Compila APK
         run: ./gradlew :wear:assembleDebug
+      - name: Screenshot dell'app
+        run: ./gradlew :wear:recordPaparazziDebug
+      # Su main, pubblica le immagini nel branch "screenshots" per vederle senza scaricare nulla.
+      - name: Pubblica screenshot
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p /tmp/shots && cp wear/src/test/snapshots/images/*.png /tmp/shots/
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout --orphan screenshots
+          git rm -rf --quiet .
+          cp /tmp/shots/*.png .
+          git add *.png
+          git commit -m "Screenshot di ${GITHUB_SHA::7}"
+          git push --force origin screenshots
       - uses: actions/upload-artifact@v5
         with:
           name: punteggio-debug-apk
