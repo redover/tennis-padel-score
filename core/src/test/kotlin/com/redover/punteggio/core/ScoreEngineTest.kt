@@ -231,18 +231,6 @@ class ScoreEngineTest {
     }
 
     @Test
-    fun `tie-break manuale vinto chiude il set`() {
-        var m = Match.start(MatchConfig.freePlay()).games(2, US).games(2, THEM)
-        m = m.tieBreak(true)
-        assertTrue(m.current.inTieBreak)
-        m = m.point(US)
-        assertEquals("1" to "0", labels(m))
-        m = m.repeat(6, US)
-        assertEquals(SetScore(3, 2, 7, 0), m.current.completedSets.single())
-        assertFalse(m.current.inTieBreak)
-    }
-
-    @Test
     fun `tie-break e punteggio normale sono conteggi separati`() {
         val m = Match.start(MatchConfig.freePlay()).points(US, US, THEM)
         assertEquals("30" to "15", labels(m))
@@ -259,18 +247,30 @@ class ScoreEngineTest {
     }
 
     @Test
-    fun `tie-break vinto azzera anche il game normale messo da parte`() {
-        var m = Match.start(MatchConfig.freePlay()).points(US, THEM).tieBreak(true)
-        m = m.repeat(7, THEM)
-        assertEquals(SetScore(0, 1, 0, 7), m.current.completedSets.single())
-        assertEquals("0" to "0", labels(m))
-        assertEquals("0" to "0", labels(m.tieBreak(true)))
-    }
-
-    @Test
     fun `il tie-break manuale viene salvato e ripristinato`() {
         val config = MatchConfig.freePlay()
         val m = Match.start(config).points(US, THEM).tieBreak(true).points(US, US)
         assertEquals(m.current, Match.decode(config, m.encodeEvents()).current)
+    }
+
+    @Test
+    fun `il tie-break manuale non ha limite`() {
+        var m = Match.start(MatchConfig.freePlay()).games(2, US).tieBreak(true)
+        m = m.repeat(15, THEM).repeat(3, US)
+        assertTrue(m.current.inTieBreak)
+        assertEquals("3" to "15", labels(m))
+        assertTrue(m.current.completedSets.isEmpty())
+        assertEquals(2, m.current.gamesUs)
+        val back = m.tieBreak(false)
+        assertEquals("0" to "0", labels(back))
+        assertEquals(2, back.current.gamesUs)
+    }
+
+    @Test
+    fun `il tie-break automatico sul 6-6 chiude ancora il set`() {
+        var m = Match.start(MatchConfig.freePlay()).games(5, US).games(5, THEM).games(1, US).games(1, THEM)
+        assertTrue(m.current.inTieBreak)
+        m = m.repeat(7, US)
+        assertEquals(SetScore(7, 6, 7, 0), m.current.completedSets.single())
     }
 }

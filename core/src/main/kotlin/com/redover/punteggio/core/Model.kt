@@ -65,6 +65,8 @@ data class MatchState(
     val pointsThem: Int = 0,
     val inTieBreak: Boolean = false,
     val isSuperTieBreak: Boolean = false,
+    /** Tie-break aperto a mano con lo swipe: conta senza limite. */
+    val isManualTieBreak: Boolean = false,
     val server: Player = config.firstServer,
     /** Chi ha servito il primo punto del tie-break in corso. */
     val tieBreakFirstServer: Player? = null,

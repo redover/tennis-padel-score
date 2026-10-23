@@ -24,7 +24,7 @@ object ScoreEngine {
     /**
      * Passa a mano dal game normale al tie-break e viceversa. Sono due conteggi separati:
      * il tie-break parte da 0-0 e, tornando indietro, il game normale è esattamente com'era.
-     * Il tie-break va a 7 e chi lo vince prende il set, come quello sul 6-6.
+     * Il tie-break manuale non ha limite di punti: si torna al game normale con lo swipe.
      */
     fun setTieBreak(state: MatchState, on: Boolean): MatchState {
         if (state.isOver || state.inTieBreak == on) return state
@@ -34,6 +34,7 @@ object ScoreEngine {
             val next = state.copy(
                 inTieBreak = true,
                 isSuperTieBreak = false,
+                isManualTieBreak = true,
                 pointsUs = tb?.us ?: 0,
                 pointsThem = tb?.them ?: 0,
                 tieBreakFirstServer = firstServer,
@@ -46,6 +47,7 @@ object ScoreEngine {
             state.copy(
                 inTieBreak = false,
                 isSuperTieBreak = false,
+                isManualTieBreak = false,
                 pointsUs = game?.us ?: 0,
                 pointsThem = game?.them ?: 0,
                 server = game?.server ?: state.server,
@@ -71,7 +73,8 @@ object ScoreEngine {
         val target = if (state.isSuperTieBreak) state.config.superTieBreakPoints else state.config.tieBreakPoints
         val mine = state.points(player)
         val theirs = state.points(player.other)
-        if (mine >= target && mine - theirs >= 2) {
+        // Il tie-break aperto a mano è un contatore libero: non finisce mai da solo.
+        if (!state.isManualTieBreak && mine >= target && mine - theirs >= 2) {
             return tieBreakWonBy(state, player)
         }
         return state.copy(server = tieBreakServer(state))
