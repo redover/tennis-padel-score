@@ -243,35 +243,37 @@ private fun MiddleBar(state: MatchState, ambient: Boolean, onReset: () -> Unit) 
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        // Set vinti e game del set corrente: Loro sopra, Noi sotto.
-        ScoreColumn(title = "SET", them = state.setsWon(Player.THEM), us = state.setsWon(Player.US))
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // A schermo attenuato niente pulsante, solo il punteggio.
-            if (!ambient) Button(
+        // Game: Loro sopra, Noi sotto. Non ci sono set: i game contano all'infinito.
+        ScoreColumn(title = "GAME", them = state.gamesThem, us = state.gamesUs)
+        // A schermo attenuato niente pulsante, solo il punteggio.
+        if (!ambient) {
+            Button(
                 onClick = onReset,
                 modifier = Modifier.size(ButtonDefaults.ExtraSmallButtonSize),
                 colors = ButtonDefaults.secondaryButtonColors(),
             ) {
                 Text("↺", fontSize = 16.sp)
             }
+        }
+        // Stessa larghezza della colonna dei game, così il pulsante resta al centro.
+        Box(modifier = Modifier.width(40.dp), contentAlignment = Alignment.Center) {
             statusLabel(state)?.let {
-                Text(it, fontSize = 9.sp, color = BallColor, textAlign = TextAlign.Center)
+                Text(it, fontSize = 9.sp, color = BallColor, textAlign = TextAlign.Center, lineHeight = 10.sp)
             }
         }
-        ScoreColumn(title = "GAME", them = state.gamesThem, us = state.gamesUs)
     }
 }
 
 private fun statusLabel(state: MatchState): String? = when {
-    state.isSuperTieBreak -> "SUPER TB"
-    state.inTieBreak -> "TIE-BREAK"
+    state.isSuperTieBreak -> "SUPER\nTB"
+    state.inTieBreak -> "TIE-\nBREAK"
     state.isGoldenPoint -> "GOLDEN"
     else -> null
 }
 
 @Composable
 private fun ScoreColumn(title: String, them: Int, us: Int) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(40.dp)) {
         Text("$them", fontSize = 14.sp, color = Color.White)
         Text(title, fontSize = 8.sp, color = Color.Gray)
         Text("$us", fontSize = 14.sp, color = Color.White)

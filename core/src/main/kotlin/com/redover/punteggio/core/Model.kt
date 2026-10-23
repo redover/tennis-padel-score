@@ -40,10 +40,10 @@ data class MatchConfig(
         fun padel() = MatchConfig(sport = Sport.PADEL, goldenPoint = true)
 
         /**
-         * Partita libera: vantaggi, set ad oltranza (niente tie-break automatico) e nessun limite di set.
-         * Il tie-break si apre solo a mano ed è un conteggio a parte, slegato dai set.
+         * Partita libera: vantaggi e game che contano all'infinito, senza mai chiudere il set.
+         * Il tie-break si apre solo a mano ed è un conteggio a parte, slegato dai game.
          */
-        fun freePlay() = MatchConfig(setsToWin = 99, tieBreakAtSixAll = false)
+        fun freePlay() = MatchConfig(setsToWin = 99, gamesPerSet = Int.MAX_VALUE, tieBreakAtSixAll = false)
     }
 }
 

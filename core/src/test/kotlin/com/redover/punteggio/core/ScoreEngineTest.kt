@@ -191,7 +191,7 @@ class ScoreEngineTest {
         var m = Match.start(MatchConfig.freePlay())
         repeat(5) { m = m.games(6, US) }
         assertNull(m.current.winner)
-        assertEquals(5, m.current.setsWon(US))
+        assertEquals(30, m.current.gamesUs)
     }
 
     @Test
@@ -267,13 +267,13 @@ class ScoreEngineTest {
     }
 
     @Test
-    fun `nella partita libera i set vanno ad oltranza`() {
-        var m = Match.start(MatchConfig.freePlay()).games(5, US).games(5, THEM).games(1, US).games(1, THEM)
+    fun `nella partita libera i game contano all'infinito`() {
+        var m = Match.start(MatchConfig.freePlay()).games(9, US).games(5, THEM)
         assertFalse(m.current.inTieBreak)
-        m = m.games(1, US).games(1, THEM).games(1, US)
         assertTrue(m.current.completedSets.isEmpty())
-        assertEquals(8 to 7, m.current.gamesUs to m.current.gamesThem)
-        m = m.games(1, US)
-        assertEquals(SetScore(9, 7), m.current.completedSets.single())
+        assertEquals(9 to 5, m.current.gamesUs to m.current.gamesThem)
+        m = m.games(10, THEM)
+        assertEquals(9 to 15, m.current.gamesUs to m.current.gamesThem)
+        assertTrue(m.current.completedSets.isEmpty())
     }
 }
