@@ -104,7 +104,7 @@ object ScoreEngine {
         val theirs = next.games(player.other)
         return when {
             mine >= target && mine - theirs >= 2 -> setWonBy(next, player, tieBreak = null)
-            gamesUs == target && gamesThem == target -> next.copy(
+            state.config.tieBreakAtSixAll && gamesUs == target && gamesThem == target -> next.copy(
                 inTieBreak = true,
                 tieBreakFirstServer = next.server,
             )

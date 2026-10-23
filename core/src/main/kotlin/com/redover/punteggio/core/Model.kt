@@ -24,6 +24,8 @@ data class MatchConfig(
     val gamesPerSet: Int = 6,
     val goldenPoint: Boolean = false,
     val tieBreakPoints: Int = 7,
+    /** Tie-break automatico sul 6-6. Se falso il set va ad oltranza, finché uno è avanti di 2 game. */
+    val tieBreakAtSixAll: Boolean = true,
     val superTieBreakFinalSet: Boolean = false,
     val superTieBreakPoints: Int = 10,
     val firstServer: Player = Player.US,
@@ -37,8 +39,11 @@ data class MatchConfig(
         fun tennis() = MatchConfig(sport = Sport.TENNIS)
         fun padel() = MatchConfig(sport = Sport.PADEL, goldenPoint = true)
 
-        /** Partita libera: regole classiche (vantaggi, tie-break sul 6-6) e set senza limite. */
-        fun freePlay() = MatchConfig(setsToWin = 99)
+        /**
+         * Partita libera: vantaggi, set ad oltranza (niente tie-break automatico) e nessun limite di set.
+         * Il tie-break si apre solo a mano ed è un conteggio a parte, slegato dai set.
+         */
+        fun freePlay() = MatchConfig(setsToWin = 99, tieBreakAtSixAll = false)
     }
 }
 

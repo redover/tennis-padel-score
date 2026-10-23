@@ -267,10 +267,13 @@ class ScoreEngineTest {
     }
 
     @Test
-    fun `il tie-break automatico sul 6-6 chiude ancora il set`() {
+    fun `nella partita libera i set vanno ad oltranza`() {
         var m = Match.start(MatchConfig.freePlay()).games(5, US).games(5, THEM).games(1, US).games(1, THEM)
-        assertTrue(m.current.inTieBreak)
-        m = m.repeat(7, US)
-        assertEquals(SetScore(7, 6, 7, 0), m.current.completedSets.single())
+        assertFalse(m.current.inTieBreak)
+        m = m.games(1, US).games(1, THEM).games(1, US)
+        assertTrue(m.current.completedSets.isEmpty())
+        assertEquals(8 to 7, m.current.gamesUs to m.current.gamesThem)
+        m = m.games(1, US)
+        assertEquals(SetScore(9, 7), m.current.completedSets.single())
     }
 }

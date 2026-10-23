@@ -15,8 +15,8 @@ android {
         // Wear OS 3+ (il OnePlus Watch 2R ha Wear OS 4).
         minSdk = 30
         targetSdk = 34
-        versionCode = 10
-        versionName = "0.10.0"
+        versionCode = 11
+        versionName = "0.11.0"
     }
 
     buildTypes {

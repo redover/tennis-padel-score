@@ -5,7 +5,7 @@ App per smartwatch Wear OS (pensata per il OnePlus Watch 2R) per tenere il punte
 ## Cosa fa
 
 - Si apre direttamente sul punteggio 0-0, senza impostazioni.
-- Punti 0 / 15 / 30 / 40 / AD, game, set e **tie-break** a 7 sul 6-6, con la rotazione corretta del servizio. I set non hanno limite: si gioca finché vuoi.
+- Punti 0 / 15 / 30 / 40 / AD, game e set ad oltranza (un set si chiude quando uno è avanti di 2 game, almeno a 6), con la rotazione corretta del servizio. Nessun limite di set e nessun tie-break automatico.
 - Indicatore di chi serve (pallina gialla).
 - La partita viene salvata a ogni punto: se l'app si chiude, riprende da dove eri.
 - Quando abbassi il polso l'app resta in primo piano (modalità sempre attivo, a schermo attenuato) e rialzandolo ritrovi subito il punteggio. Per vederla anche a polso abbassato attiva "Display sempre attivo" nelle impostazioni dell'orologio.
