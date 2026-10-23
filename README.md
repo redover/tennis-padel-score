@@ -5,7 +5,7 @@ App per smartwatch Wear OS (pensata per il OnePlus Watch 2R) per tenere il punte
 ## Cosa fa
 
 - Si apre direttamente sul punteggio 0-0, senza impostazioni.
-- Punti 0 / 15 / 30 / 40 / AD, e game che contano all'infinito (il set non si chiude mai da solo), con la rotazione corretta del servizio. Nessun tie-break automatico.
+- Punti 0 / 15 / 30 / 40 / AD, game e set ad oltranza (un set si chiude quando uno è avanti di 2 game, almeno a 6), con la rotazione corretta del servizio. Nessun limite di set e nessun tie-break automatico.
 - Indicatore di chi serve (pallina gialla).
 - La partita viene salvata a ogni punto: se l'app si chiude, riprende da dove eri.
 - Quando abbassi il polso l'app resta in primo piano (modalità sempre attivo, a schermo attenuato) e rialzandolo ritrovi subito il punteggio. Per vederla anche a polso abbassato attiva "Display sempre attivo" nelle impostazioni dell'orologio.
@@ -17,7 +17,7 @@ App per smartwatch Wear OS (pensata per il OnePlus Watch 2R) per tenere il punte
 - In ogni metà: tocca a **destra** per aggiungere un punto, a **sinistra** per toglierlo.
 - **Scorri verso l'alto** per dare il servizio a loro, **verso il basso** per darlo a noi. La pallina gialla indica chi serve e da lì la rotazione continua da sola.
 - **Scorri a destra** per trasformare il game in tie-break (conteggio separato che parte da 0-0 e non ha limite di punti), **a sinistra** per tornare al game normale, che resta com'era. Lo swipe a destra quindi non chiude l'app: per uscire usa il tasto dell'orologio.
-- Al centro vedi i game (loro sopra, noi sotto). Il pulsante **↺** apre un menu: **Azzera punteggio**, **Chiudi app** oppure Annulla. La partita resta aperta anche a schermo spento, quindi per chiuderla usa "Chiudi app".
+- Al centro vedi set e game. Il pulsante **↺** apre un menu: **Azzera punteggio**, **Chiudi app** oppure Annulla. La partita resta aperta anche a schermo spento, quindi per chiuderla usa "Chiudi app".
 
 ## Struttura
 
